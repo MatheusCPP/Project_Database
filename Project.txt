@@ -1,0 +1,938 @@
+//crindo banco de dados
+CREATE DATABASE IF NOT EXISTS db_bigbike;
+//selecionado a tabela
+USE db_bigbike;
+
+//criando tabela tb_classe_principal
+CREATE TABLE IF NOT EXISTS tb_classe_principal (
+  id int NOT NULL AUTO_INCREMENT,
+  descricao varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (id)
+) COLLATE=utf8mb4_0900_ai_ci;
+
+//criando tabela tb_classe_secundaria
+CREATE TABLE IF NOT EXISTS tb_classe_secundaria (
+  id int NOT NULL AUTO_INCREMENT,
+  descricao varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (id)
+) COLLATE=utf8_unicode_ci;
+
+//criando tabela tb_clientes
+CREATE TABLE IF NOT EXISTS tb_clientes (
+  id int NOT NULL AUTO_INCREMENT,
+  nome varchar(75) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  telefone varchar(13) COLLATE utf8_unicode_ci DEFAULT NULL,
+  email varchar(75) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (id)
+) COLLATE=utf8_unicode_ci;
+
+//criando tabela tb_funcionarios
+CREATE TABLE IF NOT EXISTS tb_funcionarios (
+  id int NOT NULL AUTO_INCREMENT,
+  nome varchar(75) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  data_nascimento date DEFAULT NULL,
+  telefone varchar(13) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  salario_base decimal(7,2) DEFAULT NULL,
+  carga_horaria int DEFAULT NULL,
+  PRIMARY KEY (id)
+) COLLATE=utf8_unicode_ci;
+
+//criando tabela tb_manutencoes
+CREATE TABLE IF NOT EXISTS tb_manutencoes (
+  id int NOT NULL AUTO_INCREMENT,
+  id_cliente int DEFAULT NULL,
+  id_funcionario int DEFAULT NULL,
+  data_entrada date DEFAULT NULL,
+  inicio_manutencao datetime DEFAULT NULL,
+  fim_manutencao datetime DEFAULT NULL,
+  data_prevista date DEFAULT NULL,
+  data_entrega date DEFAULT NULL,
+  PRIMARY KEY (id)
+) COLLATE=utf8_unicode_ci;
+
+//criando tabela tb_orcamentos
+CREATE TABLE IF NOT EXISTS tb_orcamentos (
+  id int NOT NULL AUTO_INCREMENT,
+  id_cliente int DEFAULT NULL,
+  id_manutencao int DEFAULT NULL,
+  id_produto int DEFAULT NULL,
+  qt_produto int DEFAULT NULL,
+  id_servico int DEFAULT NULL,
+  qt_servico int DEFAULT NULL,
+  data_orcamento datetime DEFAULT NULL,
+  PRIMARY KEY (id)
+) COLLATE=utf8_unicode_ci;
+
+//criando tabela tb_produtos
+CREATE TABLE IF NOT EXISTS tb_produtos (
+  id int NOT NULL AUTO_INCREMENT,
+  id_classe_principal int DEFAULT NULL,
+  id_classe_secundaria int DEFAULT NULL,
+  descricao varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  vl_compra decimal(7,2) DEFAULT NULL,
+  vl_venda decimal(7,2) DEFAULT NULL,
+  qt_estoque int DEFAULT NULL,
+  qt_min_estoque int DEFAULT NULL,
+  PRIMARY KEY (id)
+) COLLATE=utf8_unicode_ci;
+
+//criando tabela tb_servicos
+CREATE TABLE IF NOT EXISTS tb_servicos (
+  id int NOT NULL AUTO_INCREMENT,
+  descricao varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  vl_manutencao decimal(7,2) DEFAULT NULL,
+  PRIMARY KEY (id)
+) COLLATE=utf8_unicode_ci;
+
+//criando tabela tb_vendas
+CREATE TABLE IF NOT EXISTS tb_vendas (
+  id int NOT NULL AUTO_INCREMENT,
+  id_orcamento int DEFAULT NULL,
+  data_venda date DEFAULT NULL,
+  forma_pagamento enum('Dinheiro','Cheque') COLLATE utf8_unicode_ci DEFAULT NULL,
+  parcelamento int DEFAULT NULL,
+  PRIMARY KEY (id)
+) COLLATE=utf8_unicode_ci;
+
+//criando fk na tabela tb_manutencoes
+ALTER TABLE tb_manutencoes
+ADD CONSTRAINT fk_man_cli
+FOREIGN KEY (id_cliente)
+REFERENCES tb_clientes (id)
+ON UPDATE CASCADE
+ON DELETE CASCADE;
+
+//criando fk na tabela tb_manutencoes
+ALTER TABLE tb_manutencoes
+ADD CONSTRAINT fk_man_fun
+FOREIGN KEY (id_funcionario)
+REFERENCES tb_funcionarios (id)
+ON UPDATE CASCADE
+ON DELETE CASCADE;
+
+//criando fk na tabela tb_orcamentos
+ALTER TABLE tb_orcamentos
+ADD CONSTRAINT fk_orc_cli
+FOREIGN KEY (id_cliente)
+REFERENCES tb_clientes (id)
+ON UPDATE CASCADE
+ON DELETE CASCADE;
+
+//criando fk na tabela tb_orcamentos
+ALTER TABLE tb_orcamentos
+ADD CONSTRAINT fk_orc_man
+FOREIGN KEY (id_manutencao)
+REFERENCES tb_manutencoes (id)
+ON UPDATE CASCADE
+ON DELETE CASCADE;
+
+//criando fk na tabela tb_orcamentos
+ALTER TABLE tb_orcamentos
+ADD CONSTRAINT fk_orc_pro
+FOREIGN KEY (id_produto)
+REFERENCES tb_produtos (id)
+ON UPDATE CASCADE
+ON DELETE CASCADE;
+
+//criando fk na tabela tb_orcamentos
+ALTER TABLE tb_orcamentos
+ADD CONSTRAINT fk_orc_ser
+FOREIGN KEY (id_servico)
+REFERENCES tb_servicos (id)
+ON UPDATE CASCADE
+ON DELETE CASCADE;
+
+//criando fk na tabela tb_produtos
+ALTER TABLE tb_produtos
+ADD CONSTRAINT fk_pro_cp
+FOREIGN KEY (id_classe_principal)
+REFERENCES tb_classe_principal (id)
+ON UPDATE CASCADE
+ON DELETE CASCADE;
+
+//criando fk na tabela tb_produtos
+ALTER TABLE tb_produtos
+ADD CONSTRAINT fk_pro_cs
+FOREIGN KEY (id_classe_secundaria)
+REFERENCES tb_classe_secundaria (id)
+ON UPDATE CASCADE
+ON DELETE CASCADE;
+
+//criando fk na tabela tb_vendas
+ALTER TABLE tb_vendas
+ADD CONSTRAINT fk_ven_orc
+FOREIGN KEY (id_orcamento)
+REFERENCES tb_orcamentos (id)
+ON UPDATE CASCADE
+ON DELETE CASCADE;
+
+//inserindo dados a rodo
+INSERT INTO tb_classe_principal (id, descricao) VALUES (1, 'Manutenção');
+INSERT INTO tb_classe_principal (id, descricao) VALUES (2, 'Acessório');
+INSERT INTO tb_classe_principal (id, descricao) VALUES (3, 'Vestuário');
+INSERT INTO tb_classe_principal (id, descricao) VALUES (4, 'Bicicleta');
+INSERT INTO tb_classe_principal (id, descricao) VALUES (5, 'Borracharia');
+INSERT INTO tb_classe_principal (id, descricao) VALUES (6, 'Hidratação');
+INSERT INTO tb_classe_principal (id, descricao) VALUES (7, 'KITs');
+INSERT INTO tb_classe_principal (id, descricao) VALUES (8, 'Serviço');
+
+
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (1, 'Alicates');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (2, 'Bagageiros');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (3, 'Bandanas');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (4, 'Bermudas');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (5, 'Bolsas');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (6, 'Bombas');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (7, 'Bretelles');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (8, 'Buzinas');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (9, 'Cadeados');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (10, 'Cadeiras');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (11, 'Calças');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (12, 'Camaras');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (13, 'Camisas');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (14, 'Campainhas');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (15, 'Canivetes');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (16, 'Capas');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (17, 'Capacetes');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (18, 'Casacos');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (19, 'Cestas');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (20, 'Chaves');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (21, 'Velocímetros');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (22, 'Cintos');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (23, 'Colas');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (24, 'Desengraxantes');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (25, 'Elasticos');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (26, 'Espatulas');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (27, 'Espelhos');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (28, 'Espumas');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (29, 'Farois');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (30, 'Garrafas');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (31, 'Graxas');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (32, 'Iluminação');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (33, 'Limpadores');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (34, 'Lubrificantes');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (35, 'Luvas');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (36, 'Macacões');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (37, 'Meias');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (38, 'Mochilas');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (39, 'Oculos');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (40, 'Oleos');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (41, 'Paralamas');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (42, 'Pneus');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (43, 'Pochetes');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (44, 'Remendos');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (45, 'Sapatilhas');
+INSERT INTO tb_classe_secundaria (id, descricao) VALUES (46, 'Sinalizadores');
+
+
+INSERT INTO tb_clientes (id, nome, telefone) VALUES (1, 'VENDA DIRETA', NULL);
+INSERT INTO tb_clientes (id, nome, telefone) VALUES (2, 'Gustavo Alencar', '(41)993526482');
+INSERT INTO tb_clientes (id, nome, telefone) VALUES (3, 'Gabriel Silva', '(41)931258463');
+INSERT INTO tb_clientes (id, nome, telefone) VALUES (4, 'Alexandre Ramos', '(41)986389521');
+INSERT INTO tb_clientes (id, nome, telefone) VALUES (5, 'Tiago Andrade', '(41)993685507');
+
+
+INSERT INTO tb_funcionarios (id, nome, data_nascimento, telefone, salario_base, carga_horaria) VALUES (1, 'Alberto', '1981-07-26', '(41)965327851', 1100.00, 9);
+INSERT INTO tb_funcionarios (id, nome, data_nascimento, telefone, salario_base, carga_horaria) VALUES (2, 'João', '2021-11-03', '(41)985635507', 1100.00, 9);
+
+
+INSERT INTO tb_manutencoes (id, id_cliente, id_funcionario, data_entrada, inicio_manutencao, fim_manutencao, data_prevista, data_entrega) VALUES (1, 2, 1, '2021-11-15', '2021-11-15 13:21:49', '2021-11-15 13:46:02', '2021-11-16', '2021-11-16');
+INSERT INTO tb_manutencoes (id, id_cliente, id_funcionario, data_entrada, inicio_manutencao, fim_manutencao, data_prevista, data_entrega) VALUES (2, 3, 1, '2021-11-16', '2021-11-16 14:56:06', '2021-11-16 15:20:03', '2021-11-17', '2021-11-17');
+INSERT INTO tb_manutencoes (id, id_cliente, id_funcionario, data_entrada, inicio_manutencao, fim_manutencao, data_prevista, data_entrega) VALUES (3, 4, 2, '2021-11-16', '2021-11-16 09:03:22', '2021-11-16 10:02:31', '2021-11-16', '2021-11-17');
+INSERT INTO tb_manutencoes (id, id_cliente, id_funcionario, data_entrada, inicio_manutencao, fim_manutencao, data_prevista, data_entrega) VALUES (4, 5, 1, '2021-11-17', '2021-11-17 13:12:37', '2021-11-17 13:26:41', '2021-11-18', '2021-11-18');
+
+
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (1, 1, NULL, 390, 1, NULL, NULL, '2021-11-15 00:00:01');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (2, 1, NULL, 403, 1, NULL, NULL, '2021-11-16 00:00:02');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (3, 1, NULL, 3, 1, NULL, NULL, '2021-11-17 00:00:03');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (4, 1, NULL, 29, 1, NULL, NULL, '2021-11-18 00:00:04');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (5, 1, NULL, 214, 1, NULL, NULL, '2021-11-15 00:00:05');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (6, 1, NULL, 186, 1, NULL, NULL, '2021-11-16 00:00:06');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (7, 1, NULL, 390, 1, NULL, NULL, '2021-11-16 00:00:07');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (8, 1, NULL, 398, 1, NULL, NULL, '2021-11-16 00:00:08');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (9, 1, NULL, 411, 1, NULL, NULL, '2021-11-16 00:00:09');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (10, 1, NULL, 331, 1, NULL, NULL, '2021-11-17 00:00:10');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (11, 1, NULL, 258, 1, NULL, NULL, '2021-11-18 00:00:11');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (12, 1, NULL, 312, 1, NULL, NULL, '2021-11-18 00:00:11');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (13, 1, NULL, 381, 1, NULL, NULL, '2021-11-19 00:00:13');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (14, 1, NULL, 522, 1, NULL, NULL, '2021-11-19 00:00:14');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (15, 1, NULL, 396, 1, NULL, NULL, '2021-11-16 00:00:15');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (16, 1, NULL, NULL, NULL, 1, 1, '2021-11-15 00:00:05');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (17, 1, NULL, NULL, NULL, 3, 1, '2021-11-18 00:00:11');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (18, 2, 1, NULL, NULL, 3, 1, '2021-11-18 00:00:12');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (19, 3, 2, NULL, NULL, 5, 1, '2021-11-19 00:00:16');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (20, 4, 3, NULL, NULL, 8, 1, '2021-11-15 00:00:17');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (21, 5, 4, NULL, NULL, 2, 1, '2021-11-16 00:00:18');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (22, 2, 1, 274, 1, NULL, NULL, '2021-11-18 00:00:12');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (23, 3, 2, 379, 1, NULL, NULL, '2021-11-19 00:00:16');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (24, 5, 4, 358, 1, NULL, NULL, '2021-11-16 00:00:18');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (25, 1, NULL, 395, 2, NULL, NULL, '2020-11-22 20:43:26');
+INSERT INTO tb_orcamentos (id, id_cliente, id_manutencao, id_produto, qt_produto, id_servico, qt_servico, data_orcamento) VALUES (26, 1, NULL, 519, 1, NULL, NULL, '2021-10-22 20:43:50');
+
+
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (1, 2, 2, 'BAGAGEIRO FLEXIVEL RABETAO', 19.00, 22.00, 48, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (2, 2, 2, 'BAGAGEIRO TUBAO FLEXIVEL (PRETO)', 16.00, 19.00, 45, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (3, 2, 5, 'BOLSA CELULAR PEQUENA', 12.00, 14.00, 33, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (4, 2, 5, 'BOLSA CELULAR PLANET', 31.00, 37.00, 25, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (5, 2, 5, 'BOLSA CELULAR ROSA PLANET', 29.00, 34.00, 10, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (6, 2, 5, 'BOLSA DE MAO', 9.00, 10.00, 30, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (7, 2, 5, 'BOLSA GUIDAO SKIN', 38.00, 45.00, 7, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (8, 2, 5, 'BOLSA P/ QUADRO', 12.00, 15.00, 23, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (9, 2, 5, 'BOLSA P/ SMARTPHONE ABST', 47.00, 56.00, 7, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (10, 2, 5, 'BOLSA QUADRO MK REDONDA', 8.00, 9.00, 8, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (11, 2, 5, 'BOLSA SELIM BING', 29.00, 35.00, 45, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (12, 2, 5, 'BOLSA SELIM EVERESTT', 24.00, 28.00, 49, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (13, 2, 5, 'BOLSA SELIM GARRA', 22.00, 26.00, 17, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (14, 2, 5, 'BOLSA SELIM RIGIDA PLANET', 18.00, 21.00, 15, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (15, 2, 5, 'BOLSA SELIM SHITARO', 13.00, 15.00, 35, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (16, 2, 5, 'BOLSA SELIM SPORTIV C/ FIVELA', 26.00, 31.00, 5, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (17, 2, 5, 'BOLSA SELIM SPORTIV VELCRO', 21.00, 25.00, 35, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (18, 2, 5, 'BOLSA SELIM TSW', 21.00, 25.00, 25, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (19, 2, 6, 'BOMBA ALUMINIO GRANDE', 15.00, 18.00, 42, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (20, 2, 6, 'BOMBA ALUMINIO GTS', 17.00, 20.00, 34, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (21, 2, 6, 'BOMBA ALUMINIO PEQUENA', 10.00, 12.00, 28, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (22, 2, 6, 'BOMBA ALUMINIO SPORTIV M21', 24.00, 28.00, 13, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (23, 2, 6, 'BOMBA GIYO C/ MANOMETRO GP95', 70.00, 83.00, 7, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (24, 2, 6, 'BOMBA MINI ALUMINIO ELLEVEN TELESC.', 28.00, 33.00, 10, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (25, 2, 6, 'BOMBA MINI NYLON EELEVEN', 23.00, 27.00, 11, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (26, 2, 6, 'BOMBA MINI SPORTIV ALUMINIO DUPLA ACAO', 24.00, 28.00, 30, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (27, 2, 6, 'BOMBA NYLON ATRIO', 14.00, 17.00, 26, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (28, 2, 6, 'BOMBA NYLON BETO', 20.00, 23.00, 33, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (29, 2, 6, 'BOMBA NYLON GIYO', 23.00, 27.00, 37, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (30, 2, 6, 'BOMBA NYLON GRANDE SPORTIV', 47.00, 55.00, 14, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (31, 2, 6, 'BOMBA NYLON VERDE SOUTH', 4.00, 5.00, 6, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (32, 2, 6, 'BOMBA NYLON/ALUMINIO C/ CALIBRADOR H1099', 40.00, 48.00, 34, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (33, 2, 6, 'BOMBA SOUTH', 8.00, 9.00, 9, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (34, 2, 8, 'BUZINA CORNETA P/ GARFO', 28.00, 33.00, 34, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (35, 2, 8, 'BUZINA CORNETA P/ GUIDAO', 15.00, 18.00, 9, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (36, 2, 8, 'BUZINA CORNETA WESTERN', 4.00, 4.00, 14, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (37, 2, 8, 'BUZINA CORNETINHA', 1.00, 1.00, 14, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (38, 2, 8, 'BUZINA FON-FON', 2.00, 2.00, 11, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (39, 2, 8, 'BUZINA PADEIRO', 9.00, 10.00, 33, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (40, 2, 8, 'BUZINA TIPO ACELERADOR (ISP)', 9.00, 10.00, 17, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (41, 2, 9, 'CADEADO CHAVE 10X1500MM (ELLEVEN)', 8.00, 9.00, 15, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (42, 2, 9, 'CADEADO CHAVE 12X1000 ELLEVEN', 9.00, 10.00, 27, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (43, 2, 9, 'CADEADO CHAVE 12X1000MM ATRIO', 12.00, 15.00, 16, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (44, 2, 9, 'CADEADO CHAVE 12X1000MM CAIRU', 8.00, 9.00, 27, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (45, 2, 9, 'CADEADO CHAVE 12X1000MM ZOLI', 12.00, 14.00, 38, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (46, 2, 9, 'CADEADO CHAVE 15X1000MM ELLEVEN', 15.00, 17.00, 46, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (47, 2, 9, 'CADEADO CHAVE 22X1500MM CAIRU', 25.00, 29.00, 28, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (48, 2, 9, 'CADEADO CHAVE 6X1000MM ABST', 8.00, 10.00, 23, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (49, 2, 9, 'CADEADO CHAVE 6X1000MM SEGREDO', 10.00, 12.00, 20, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (50, 2, 9, 'CADEADO CHAVE 80 CM ISP', 10.00, 12.00, 19, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (51, 2, 9, 'CADEADO CHAVE 8X1000MM ATRIO', 7.00, 9.00, 6, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (52, 2, 9, 'CADEADO COMUM ABST', 7.00, 9.00, 44, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (53, 2, 9, 'CADEADO FERRADURA TP ANTIGO', 14.00, 17.00, 28, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (54, 2, 9, 'CADEADO SEGREDO FINO', 7.00, 9.00, 8, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (55, 2, 9, 'CADEADO SEGREDO JR', 11.00, 13.00, 50, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (56, 2, 10, 'CADEIRA DIANTEIRA KALF', 81.00, 95.00, 34, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (57, 2, 10, 'CADEIRA DIANTEIRA TUBULAR MTB', 68.00, 80.00, 34, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (58, 2, 10, 'CADEIRA P/ BAGAGEIRO KALF', 75.00, 88.00, 26, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (59, 2, 10, 'CADEIRA P/ BAGAGEIRO KALF FUN 22KG', 114.00, 135.00, 17, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (60, 2, 10, 'CADEIRA P/ GUIDAO LUXO', 33.00, 39.00, 20, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (61, 2, 10, 'CADEIRA STYLO BASICA', 24.00, 28.00, 35, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (62, 2, 10, 'CADEIRA TRASEIRA STYL', 44.00, 52.00, 18, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (63, 2, 14, 'CAMPAINHA CROMADA', 4.00, 5.00, 50, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (64, 2, 14, 'CAMPAINHA I LOVE MY BIKE', 5.00, 6.00, 39, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (65, 2, 14, 'CAMPAINHA PLIM PLIM ZEFAL', 5.00, 6.00, 48, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (66, 2, 14, 'CAMPAINHA PLIM-PLIM', 2.00, 3.00, 8, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (67, 2, 15, 'CANIVETE ABST C/ SACA PINO CORRENTE', 63.00, 74.00, 49, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (68, 2, 15, 'CANIVETE C/ SACA PINO CORRENTE 5F ABST', 38.00, 45.00, 11, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (69, 2, 15, 'CANIVETE C/ SACA PINO CORRENTE ELLEVEN', 28.00, 33.00, 14, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (70, 2, 15, 'CANIVETE SPORTIV 7F', 17.00, 20.00, 32, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (71, 2, 17, 'CAPACETE ABSOLUTE NERO', 66.00, 78.00, 23, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (72, 2, 17, 'CAPACETE BABY TRIZ/PTK', 27.00, 32.00, 25, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (73, 2, 17, 'CAPACETE CXR', 73.00, 86.00, 9, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (74, 2, 17, 'CAPACETE ELLEVEN', 55.00, 65.00, 34, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (75, 2, 17, 'CAPACETE GARA S/ VISEIRA', 52.00, 61.00, 47, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (76, 2, 17, 'CAPACETE GTS', 58.00, 68.00, 42, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (77, 2, 17, 'CAPACETE GTS LARANJA FOSCO', 80.00, 94.00, 30, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (78, 2, 17, 'CAPACETE HIGH ONE WIN C/ LED', 35.00, 42.00, 25, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (79, 2, 17, 'CAPACETE INFANTIL KIDZAMO', 42.00, 50.00, 15, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (80, 2, 17, 'CAPACETE INFANTIL SOUTH', 30.00, 35.00, 46, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (81, 2, 17, 'CAPACETE MAGMA LAZER', 326.00, 384.00, 39, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (82, 2, 17, 'CAPACETE NIPARTE', 75.00, 88.00, 16, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (83, 2, 17, 'CAPACETE PTK RUNNER', 37.00, 44.00, 40, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (84, 2, 17, 'CAPACETE RAVA', 42.00, 50.00, 16, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (85, 2, 17, 'CAPACETE TRIZ RITMO', 30.00, 36.00, 20, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (86, 2, 17, 'CAPACETE TRIZ/PTK JUNIOR', 29.00, 35.00, 40, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (87, 2, 17, 'CAPACETE TSW RAPTOR', 56.00, 65.00, 46, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (88, 2, 17, 'CAPACETE TSW WALK/SPACE NEW', 44.00, 51.00, 50, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (89, 2, 17, 'CAPACETE VOLCANO HIGH ONE', 48.00, 56.00, 15, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (90, 2, 16, 'CAPA P/ BIKE', 25.00, 29.00, 12, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (91, 2, 16, 'CAPA P/ SELIM CORVIM', 3.00, 4.00, 19, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (92, 2, 16, 'CAPA PROTETORA P/ CELULAR', 4.00, 5.00, 45, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (93, 2, 16, 'CAPA SELIM GEL', 24.00, 29.00, 25, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (94, 2, 16, 'CAPA SELIM GEL ISP', 40.00, 48.00, 19, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (95, 2, 19, 'CESTA 26 PRETA SOUTH', 14.00, 16.00, 34, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (96, 2, 19, 'CESTA ARO 16', 10.00, 12.00, 22, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (97, 2, 19, 'CESTA ARO 20', 10.00, 12.00, 22, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (98, 2, 19, 'CESTA ARO 20 ROSA', 8.00, 10.00, 32, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (99, 2, 19, 'CESTA ARO 26 ROSA', 11.00, 13.00, 29, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (100, 2, 19, 'CESTA ARO 26X31CM', 13.00, 15.00, 23, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (101, 2, 19, 'CESTA ARO 26X35CM', 13.00, 15.00, 48, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (102, 2, 19, 'CESTA PLASTICA ARO 16', 2.00, 3.00, 45, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (103, 2, 25, 'ELASTICO 1,0 M', 1.00, 1.00, 33, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (104, 2, 25, 'ELASTICO 1,5 M', 1.00, 1.00, 25, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (105, 2, 25, 'ELASTICO 1,5 M BORRACHA CAIRU', 2.00, 2.00, 10, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (106, 2, 25, 'ELASTICO 1,5M IMPORTADO ISP', 3.00, 4.00, 30, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (107, 2, 27, 'ESPELHO REDONDO ALLKAR', 3.00, 4.00, 7, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (108, 2, 27, 'ESPELHO RETANGULAR PAR CAIRU', 9.00, 11.00, 23, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (109, 2, 27, 'ESPELHO RETANGULAR TP MOTO PAR', 25.00, 29.00, 7, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (110, 2, 27, 'ESPELHO RETROVISOR ESQUERDO', 4.00, 5.00, 8, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (111, 2, 27, 'ESPELHO RETROVISOR PEQUENO REDONDO', 3.00, 4.00, 45, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (112, 2, 29, 'FAROL /SINALIZADOR C/ PILHA', 18.00, 21.00, 49, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (113, 2, 29, 'FAROL 1 LED USB ABST JY7029', 50.00, 59.00, 17, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (114, 2, 29, 'FAROL 1000 LMS C/ CARREGADOR EC-6183', 136.00, 160.00, 15, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (115, 2, 29, 'FAROL 12V C/ DINAMO', 45.00, 53.00, 35, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (116, 2, 29, 'FAROL 600LMS TSW', 110.00, 130.00, 5, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (117, 2, 29, 'FAROL C/ BATERIA EXTERNA DR 133', 34.00, 40.00, 35, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (118, 2, 29, 'FAROL CABECAO LL82783', 51.00, 60.00, 25, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (119, 2, 29, 'FAROL USB ABSOLUTE 1000 LMS', 65.00, 77.00, 42, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (120, 2, 29, 'FAROL USB C/ SENSOR BC21', 87.00, 103.00, 34, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (121, 2, 29, 'FAROL USB EC-6157', 59.00, 70.00, 28, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (122, 2, 29, 'FAROL USB ECOODA EC6146', 43.00, 51.00, 13, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (123, 2, 29, 'FAROL USB GB718', 58.00, 69.00, 7, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (124, 2, 29, 'FAROL USB QY 0111', 51.00, 60.00, 10, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (125, 2, 29, 'FAROL USB TK2', 74.00, 88.00, 11, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (126, 2, 29, 'FAROL/SINALIZADOR USB ABSOLUTE PAR', 69.00, 81.00, 30, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (127, 2, 30, 'GARRAFA 500ML HIGH ONE', 2.00, 3.00, 26, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (128, 2, 30, 'GARRAFA GARRA C/ SUPORTE 750ML', 5.00, 6.00, 33, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (129, 2, 30, 'GARRAFA GARRA TERMICA 600ML', 18.00, 22.00, 37, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (130, 2, 30, 'GARRAFA INFANTIL 300 ML', 2.00, 3.00, 14, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (131, 2, 30, 'GARRAFA ISOTERMICA 600ML PTK', 16.00, 19.00, 6, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (132, 2, 30, 'GARRAFA ISOTERMICA 700ML TRIZ', 20.00, 24.00, 34, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (133, 2, 30, 'GARRAFA ISOTERMICA IMPACTO 400ML', 6.00, 7.00, 9, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (134, 2, 30, 'GARRAFA ISOTERMICA IMPACTO 550ML', 7.00, 8.00, 34, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (135, 2, 30, 'GARRAFA OGGI 500ML', 2.00, 3.00, 9, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (136, 2, 30, 'GARRAFA PTK 550ML', 2.00, 2.00, 14, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (137, 2, 30, 'GARRAFA SENSE/ HIGH ONE 500ML', 2.00, 3.00, 14, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (138, 2, 30, 'GARRAFA SQUEESE SP', 12.00, 14.00, 11, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (139, 2, 30, 'GARRAFA TERMICA 500ML HW52', 9.00, 11.00, 33, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (140, 2, 30, 'GARRAFA TRIZ 600ML TERMICA', 18.00, 22.00, 17, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (141, 2, 30, 'GARRAFA TRIZ 650 ML', 6.00, 7.00, 15, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (142, 2, 30, 'GARRAFA TRIZ JET 560ML', 14.00, 17.00, 27, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (143, 2, 30, 'GARRAFA TSW 650ML', 5.00, 6.00, 16, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (144, 2, 30, 'GARRAFA TSW PIVOT 560ML', 7.00, 9.00, 27, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (145, 2, 38, 'MOCHILA HIDRATAÇÃO OGGI 2L ROSA', 1.00, 1.00, 38, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (146, 2, 38, 'MOCHILA HIDRATAÇÃO OGGI 1L', 26.00, 31.00, 46, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (147, 2, 38, 'MOCHILA HIDRATAÇÃO OGGI 2L BIG WHEEL', 94.00, 111.00, 28, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (148, 2, 38, 'MOCHILA HIDRATAÇÃO PLANET 2L', 65.00, 76.00, 23, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (149, 2, 38, 'MOCHILA HIRATACAO 2L VERMELHA OGGI', 80.00, 95.00, 20, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (150, 2, 38, 'MOCHILA X TIME', 56.00, 66.00, 19, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (151, 2, 39, 'OCULOS 3 LENTES CXR', 74.00, 88.00, 6, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (152, 2, 39, 'OCULOS 3 LENTES CXR (T6089/6123)', 9.00, 11.00, 44, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (153, 2, 39, 'OCULOS 3 LENTES CXR (T9445)', 85.00, 100.00, 28, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (154, 2, 39, 'OCULOS 5 LTS ROCKBROSS', 50.00, 59.00, 8, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (155, 2, 39, 'OCULOS 5 LTS TP OKLEY', 76.00, 89.00, 50, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (156, 2, 39, 'OCULOS ABSOLUTE PRIME', 135.00, 159.00, 34, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (157, 2, 39, 'OCULOS P/ CICLISMO OKLEY', 110.00, 130.00, 34, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (158, 2, 39, 'OCULOS PLANET GCH', 87.00, 103.00, 26, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (159, 2, 39, 'ÓCULOS SILICONE', 17.00, 21.00, 17, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (160, 2, 39, 'OCULOS SUNGLASS', 38.00, 45.00, 20, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (161, 2, 41, 'PARALAMA 16 NYLON', 38.00, 45.00, 35, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (162, 2, 41, 'PARALAMA 26 CROMADO', 29.00, 35.00, 18, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (163, 2, 41, 'PARALAMA 26 INOX', 2.00, 3.00, 50, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (164, 2, 41, 'PARALAMA 26 PINTADO', 14.00, 16.00, 39, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (165, 2, 41, 'PARALAMA 26 TIPO ANTIGO', 16.00, 19.00, 48, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (166, 2, 41, 'PARALAMA CARGUEIRA', 12.00, 14.00, 8, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (167, 2, 41, 'PARALAMA MUD GUARD DIANTEIRO', 16.00, 18.00, 49, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (168, 2, 41, 'PARALAMA MUDBIKE TRASEIRO', 10.00, 12.00, 11, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (169, 2, 43, 'POCHETE MEDIA H1236/1234', 5.00, 7.00, 14, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (170, 2, 43, 'POCHETE P/ CELULAR', 4.00, 4.00, 32, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (171, 2, 43, 'POCHETE SP', 24.00, 29.00, 23, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (172, 2, 46, 'SINALIZADOR 1 LEDS ROCKS', 7.00, 9.00, 25, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (173, 2, 46, 'SINALIZADOR 2 LEDS ABST', 7.00, 8.00, 9, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (174, 2, 46, 'SINALIZADOR 2 LEDS CAIRU', 0.00, 0.00, 34, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (175, 2, 46, 'SINALIZADOR FXH0105 USB', 21.00, 24.00, 47, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (176, 2, 46, 'SINALIZADOR TRAS. USB DC918', 5.00, 6.00, 42, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (177, 2, 46, 'SINALIZADOR TRASEIRO BK500', 14.00, 17.00, 30, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (178, 2, 46, 'SINALIZADOR TRASEIRO H1046 PLANET', 11.00, 13.00, 25, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (179, 2, 46, 'SINALIZADOR TRASEIRO USB GB 2028', 25.00, 30.00, 15, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (180, 2, 46, 'SINALIZADOR TRASEIRO USB H1518', 17.00, 20.00, 46, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (181, 2, 46, 'SINALIZADOR TRASEIRO ZH1808', 38.00, 45.00, 39, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (182, 2, 46, 'SINALIZADOR USB 100LMS VDS-261', 17.00, 20.00, 16, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (183, 2, 46, 'SINALIZADOR USB ABST JY6102T', 24.00, 29.00, 40, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (184, 2, 46, 'SINALIZADOR USB BARATINHA BING GCH BC 918', 21.00, 24.00, 16, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (185, 2, 46, 'SINALIZADOR USB BS216 BARATINHA', 34.00, 40.00, 20, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (186, 2, 46, 'SINALIZADOR USB EC-6106 BARATINHA SP', 22.00, 26.00, 40, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (187, 2, 46, 'SINALIZADOR USB EC-6173', 31.00, 37.00, 46, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (188, 2, 46, 'SINALIZADOR USB MULTICOR GB096', 16.00, 19.00, 50, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (189, 2, 46, 'SINALIZADOR USB TRAS. AQY096', 16.00, 18.00, 15, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (190, 5, 42, 'PNEU 14X1.75 VEE RUBBER', 15.00, 18.00, 14, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (191, 5, 42, 'PNEU 14X2.125 DSI', 16.00, 19.00, 11, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (192, 5, 42, 'PNEU 16 X1.75 LEVORIN', 14.00, 17.00, 33, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (193, 5, 42, 'PNEU 16X1.75 SERVIS', 16.00, 19.00, 17, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (194, 5, 42, 'PNEU 16X1.75 VEE RUBBER', 20.00, 24.00, 15, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (195, 5, 42, 'PNEU 20 CARGA', 32.00, 38.00, 27, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (196, 5, 42, 'PNEU 20X1.75 CHAOYANG', 27.00, 32.00, 16, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (197, 5, 42, 'PNEU 20X1.75 KENDA', 24.00, 28.00, 27, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (198, 5, 42, 'PNEU 20X1.75 LEVORIN', 23.00, 27.00, 38, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (199, 5, 42, 'PNEU 20X1.75 MINI SUPER (KENDA)', 24.00, 28.00, 46, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (200, 5, 42, 'PNEU 20X1.75 PIRELLI', 29.00, 35.00, 28, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (201, 5, 42, 'PNEU 20X1.75 SERVIS', 20.00, 24.00, 23, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (202, 5, 42, 'PNEU 20X1.90 ARISUN', 24.00, 28.00, 20, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (203, 5, 42, 'PNEU 20X1.95 K 816 KENDA', 25.00, 30.00, 19, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (204, 5, 42, 'PNEU 20X1.95 LOTUS', 26.00, 30.00, 6, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (205, 5, 42, 'PNEU 20X2.10 ARISUN', 20.00, 23.00, 44, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (206, 5, 42, 'PNEU 20X2.125 MOTOCROSS KENDA', 23.00, 28.00, 28, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (207, 5, 42, 'PNEU 20X2.125 SCORPION PIRELLI', 27.00, 32.00, 8, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (208, 5, 42, 'PNEU 20X2.125 V RUBBER', 22.00, 26.00, 50, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (209, 5, 42, 'PNEU 20X2.25 FLAME', 48.00, 57.00, 34, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (210, 5, 42, 'PNEU 20X2.25 FREESTYLE V RUBBER', 22.00, 26.00, 34, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (211, 5, 42, 'PNEU 20X2.30 CHAO YANG (H544)', 17.00, 21.00, 26, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (212, 5, 42, 'PNEU 20X4.1/4', 107.00, 127.00, 17, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (213, 5, 42, 'PNEU 24X1.3/8 CINZA', 19.00, 22.00, 20, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (214, 5, 42, 'PNEU 24X1.75 LOTUS', 29.00, 35.00, 35, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (215, 5, 42, 'PNEU 24X1.95 EXCESS LEVORIN', 27.00, 32.00, 18, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (216, 5, 42, 'PNEU 24X1.95 PIRELLI', 28.00, 33.00, 50, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (217, 5, 42, 'PNEU 26X1.1/2X 2 (LEVORIN)', 26.00, 31.00, 39, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (218, 5, 42, 'PNEU 26X1.1/2X1.3/4 LEVORIN', 29.00, 35.00, 48, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (219, 5, 42, 'PNEU 26X1.1/2X2 GRIPA (KENDA)', 26.00, 30.00, 8, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (220, 5, 42, 'PNEU 26X1.1/2X2 KENDA', 28.00, 34.00, 49, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (221, 5, 42, 'PNEU 26X1.1/2X2 LOTUS', 29.00, 34.00, 11, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (222, 5, 42, 'PNEU 26X1.1/2X2 PIRELLI M TURBO', 32.00, 38.00, 14, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (223, 5, 42, 'PNEU 26X1.1/2X2 PRIMOR ( PIRELLI)', 38.00, 45.00, 32, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (224, 5, 42, 'PNEU 26X1.3/8 PIRELLI', 27.00, 32.00, 23, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (225, 5, 42, 'PNEU 26X1.3/8 VEE RUBBER', 30.00, 35.00, 25, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (226, 5, 42, 'PNEU 26X1.50 FX BRANCA VEE RUBBER', 43.00, 50.00, 9, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (227, 5, 42, 'PNEU 26X1.50 SLICK PTO', 27.00, 32.00, 34, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (228, 5, 42, 'PNEU 26X1.75 LEVORIN', 25.00, 29.00, 47, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (229, 5, 42, 'PNEU 26X1.95 K816', 31.00, 37.00, 42, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (230, 5, 42, 'PNEU 26X1.95 K847', 39.00, 45.00, 30, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (231, 5, 42, 'PNEU 26X1.95 K847 (SEMI-SLICK)', 31.00, 36.00, 25, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (232, 5, 42, 'PNEU 26X1.95 LEVORIN', 28.00, 33.00, 15, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (233, 5, 42, 'PNEU 26X1.95 LOTUS', 22.00, 26.00, 46, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (234, 5, 42, 'PNEU 26X1.95 SKINWALL CHAOYANG', 32.00, 38.00, 39, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (235, 5, 42, 'PNEU 26X1.95 SLICK FAIXA KENDA', 34.00, 40.00, 16, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (236, 5, 42, 'PNEU 26X1.95 SLICK LEVORIN', 25.00, 30.00, 40, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (237, 5, 42, 'PNEU 26X1.95 SLICK PRETO KENDA', 28.00, 33.00, 16, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (238, 5, 42, 'PNEU 26X2.00 (VEE RUBBER)', 21.00, 24.00, 20, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (239, 5, 42, 'PNEU 26X2.00 SCORPION MB2', 34.00, 40.00, 40, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (240, 5, 42, 'PNEU 26X2.00 VICTORY SKINWALL', 29.00, 35.00, 46, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (241, 5, 42, 'PNEU 26X2.10 VEE RUBBER', 29.00, 34.00, 50, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (242, 5, 42, 'PNEU 26X2.125 FLAME', 48.00, 56.00, 15, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (243, 5, 42, 'PNEU 26X2.30 ARISUN', 55.00, 65.00, 12, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (244, 5, 42, 'PNEU 26X2.30 LOTUS', 48.00, 56.00, 19, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (245, 5, 42, 'PNEU 26X2.35CHAOYANG', 60.00, 71.00, 45, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (246, 5, 42, 'PNEU 26X2X1.3/4 CARGUEIRA', 17.00, 20.00, 25, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (247, 5, 42, 'PNEU 27,5X2.00 SAGUARO', 47.00, 55.00, 19, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (248, 5, 42, 'PNEU 27,5X2.10 DELI TIRE', 28.00, 34.00, 34, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (249, 5, 42, 'PNEU 27,5X2.20 PIRELLI', 32.00, 38.00, 22, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (250, 5, 42, 'PNEU 27X1.1/4 FAIXA KENDA', 39.00, 45.00, 22, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (251, 5, 42, 'PNEU 27X1.1/4 PIRELLI', 27.00, 32.00, 32, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (252, 5, 42, 'PNEU 27X1.1/4 PRETO KENDA', 33.00, 39.00, 29, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (253, 5, 42, 'PNEU 28 KENDA BRANCO', 12.00, 15.00, 23, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (254, 5, 42, 'PNEU 28 X1.1/2 SRI', 16.00, 18.00, 48, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (255, 5, 42, 'PNEU 28X1.1/2 PIRELLI', 33.00, 39.00, 45, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (256, 5, 42, 'PNEU 29X1.95 SLICK PIRELLI', 37.00, 44.00, 33, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (257, 5, 42, 'PNEU 29X2.0 SCORPION MB2', 38.00, 44.00, 25, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (258, 5, 42, 'PNEU 29X2.00 SCORPION MB2 KEVLAR', 53.00, 63.00, 10, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (259, 5, 42, 'PNEU 29X2.10 CHAOYANG VICTORY', 33.00, 39.00, 30, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (260, 5, 42, 'PNEU 29X2.10 COLINA LEVORIN', 35.00, 42.00, 7, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (261, 5, 42, 'PNEU 29X2.10 KENDA KADRE', 47.00, 55.00, 23, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (262, 5, 42, 'PNEU 29X2.10 VEE RUBBER', 51.00, 60.00, 7, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (263, 5, 42, 'PNEU 29X2.20 CHAOYANG SKINWALL', 73.00, 86.00, 8, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (264, 5, 42, 'PNEU 29X2.20 SCORPION', 56.00, 66.00, 45, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (265, 5, 42, 'PNEU 29X2.20 SCORPION KEVLAR', 103.00, 121.00, 49, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (266, 5, 42, 'PNEU 700X23 KENDA', 45.00, 53.00, 17, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (267, 5, 42, 'PNEU 700X23 KEVLAR SCHWALBE', 73.00, 87.00, 15, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (268, 5, 42, 'PNEU 700X25 KENDA', 30.00, 36.00, 35, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (269, 5, 42, 'PNEU 700X25 PIRELLI', 30.00, 35.00, 5, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (270, 5, 42, 'PNEU 700X28 (KENDA)', 34.00, 40.00, 35, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (271, 5, 42, 'PNEU 700X32 PIRELLI', 26.00, 30.00, 25, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (272, 5, 42, 'PNEU 700X38 PIRELLI', 25.00, 30.00, 42, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (273, 5, 42, 'PNEU 700X45 TOURING( 29X1.75 )', 30.00, 35.00, 34, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (274, 5, 12, 'CAMARA 12 KENDA', 9.00, 10.00, 28, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (275, 5, 12, 'CAMARA 16 JOURNEY', 6.00, 7.00, 13, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (276, 5, 12, 'CAMARA 16 KENDA', 7.00, 8.00, 7, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (277, 5, 12, 'CAMARA 16 LEVORIN', 5.00, 7.00, 10, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (278, 5, 12, 'CAMARA 20 KENDA', 7.00, 8.00, 11, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (279, 5, 12, 'CAMARA 20 VEE RUBBER', 9.00, 10.00, 30, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (280, 5, 12, 'CAMARA 20X2.125 LARGA CHAOYANG', 8.00, 10.00, 26, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (281, 5, 12, 'CAMARA 24 PACO', 10.00, 12.00, 33, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (282, 5, 12, 'CAMARA 24 PIRELLI', 9.00, 10.00, 37, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (283, 5, 12, 'CAMARA 24X1.3/8 VEERUBBER', 10.00, 11.00, 14, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (284, 5, 12, 'CAMARA 26 KENDA', 9.00, 11.00, 6, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (285, 5, 12, 'CAMARA 26 LEVORIN', 8.00, 10.00, 34, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (286, 5, 12, 'CAMARA 26 MAXTUBE', 7.00, 8.00, 9, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (287, 5, 12, 'CAMARA 26 PIRELLI', 9.00, 11.00, 34, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (288, 5, 12, 'CAMARA 26 PIRELLI BICO LONGO', 10.00, 12.00, 9, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (289, 5, 12, 'CAMARA 26 PIRELLI PRESTA', 9.00, 11.00, 14, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (290, 5, 12, 'CAMARA 26 PIRELLI VALVULA 48MM', 8.00, 10.00, 14, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (291, 5, 12, 'CAMARA 26 VEE RUBEER BICO LONGO', 6.00, 8.00, 11, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (292, 5, 12, 'CAMARA 26X1.3/8 KENDA', 10.00, 12.00, 33, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (293, 5, 12, 'CAMARA 26X1.3/8 VEE RUBBER', 9.00, 10.00, 17, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (294, 5, 12, 'CAMARA 26X1.50 KENDA', 10.00, 12.00, 15, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (295, 5, 12, 'CAMARA 26X1.95 CHAOYANG C/ SELANTE', 11.00, 13.00, 27, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (296, 5, 12, 'CAMARA 26X2.35 VEERUBBER', 19.00, 22.00, 16, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (297, 5, 12, 'CAMARA 27 KENDA', 11.00, 14.00, 27, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (298, 5, 12, 'CAMARA 27 PIRELLI', 11.00, 13.00, 38, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (299, 5, 12, 'CAMARA 27 VEERUBBER', 8.00, 9.00, 46, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (300, 5, 12, 'CAMARA 27,5 PIRELLI', 9.00, 11.00, 28, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (301, 5, 12, 'CAMARA 27,5 PRESTA PIRELLI', 11.00, 13.00, 23, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (302, 5, 12, 'CAMARA 28 KENDA', 15.00, 18.00, 20, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (303, 5, 12, 'CAMARA 29 ARISUN', 16.00, 18.00, 19, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (304, 5, 12, 'CAMARA 29 ARISUN PRESTA', 17.00, 21.00, 6, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (305, 5, 12, 'CAMARA 29 JOURNEY PRESTA', 13.00, 16.00, 44, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (306, 5, 12, 'CAMARA 29 KENDA', 15.00, 18.00, 28, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (307, 5, 12, 'CAMARA 29 KENDA C/ SELANTE', 27.00, 32.00, 8, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (308, 5, 12, 'CAMARA 29 KENDA PRESTA', 15.00, 18.00, 50, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (309, 5, 12, 'CAMARA 29 KENDA PRESTA', 19.00, 22.00, 34, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (310, 5, 12, 'CAMARA 29 PIRELLI', 17.00, 20.00, 34, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (311, 5, 12, 'CAMARA 29 PRESTA PIRELLI', 18.00, 22.00, 26, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (312, 5, 12, 'CAMARA 29 VEE RUBBER', 16.00, 19.00, 17, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (313, 5, 12, 'CAMARA 29 VELOFORCE', 13.00, 15.00, 20, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (314, 5, 12, 'CAMARA 700X23 BICO GROSSO (KENDA)', 11.00, 13.00, 35, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (315, 5, 12, 'CAMARA 700X23 C/ SELANTE', 32.00, 38.00, 18, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (316, 5, 12, 'CAMARA 700X23 CHAOYANG 60MM', 18.00, 21.00, 50, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (317, 5, 12, 'CAMARA 700X23 PRESTA CHAOYANG', 10.00, 12.00, 39, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (318, 5, 12, 'CAMARA 700X23 PRESTA KENDA', 14.00, 16.00, 48, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (319, 5, 12, 'CAMARA 700X23 VEE RUBBER', 10.00, 12.00, 8, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (320, 5, 12, 'CAMARA 700X25 KENDA PRESTA', 14.00, 17.00, 49, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (321, 5, 12, 'CAMARA 700X25/28 PRESTA (VEE RUBBER)', 12.00, 15.00, 11, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (322, 5, 12, 'CAMARA 700X28 C/ SELANTE', 31.00, 37.00, 14, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (323, 5, 12, 'CAMARA 700X28/32 KENDA', 9.00, 11.00, 32, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (324, 5, 12, 'CAMARA 700X28/32 PRESTA (KENDA)', 16.00, 19.00, 23, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (325, 5, 12, 'CAMARA 700X28/45 PRESTA PIRELLI', 12.00, 15.00, 25, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (326, 5, 12, 'CAMARA 700X35/43 KENDA', 12.00, 14.00, 9, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (327, 5, 12, 'CAMARA 700X35/43 PRESTA KENDA', 16.00, 19.00, 34, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (328, 5, 12, 'CAMARA 700X38 PRESTA VEE RUBBER', 13.00, 16.00, 47, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (329, 1, 40, 'OLEO P/ CORRENTE', 2.00, 2.00, 1, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (330, 1, 1, 'ALICATE CORTE CABO PRO', 124.00, 146.00, 0, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (331, 1, 1, 'ALICATE P/ INST./REMOVER EMENDA CORRENTE', 125.00, 148.00, 1, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (332, 1, 20, 'CHAVE ALLEN', 5.00, 6.00, 1, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (333, 1, 20, 'CHAVE ALLEN 6MM', 2.00, 3.00, 23, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (334, 1, 20, 'CHAVE ALLEN NM', 11.00, 13.00, 48, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (335, 1, 20, 'CHAVE ALLEN PRO 2 A 10 MM', 105.00, 124.00, 45, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (336, 1, 20, 'CHAVE ALLEN TSW', 10.00, 12.00, 33, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (337, 1, 20, 'CHAVE ALLEN Y SHIMANO', 27.00, 32.00, 25, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (338, 1, 20, 'CHAVE CANIVETE 15F WESTERN', 17.00, 20.00, 10, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (339, 1, 20, 'CHAVE CANIVETE TSW', 10.00, 12.00, 30, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (340, 1, 20, 'CHAVE COMBINADA 13MM', 5.00, 6.00, 7, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (341, 1, 20, 'CHAVE COMBINADA 15MM', 5.00, 6.00, 23, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (342, 1, 20, 'CHAVE CONE 13/15/17MM', 11.00, 13.00, 7, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (343, 1, 20, 'CHAVE EXT. MOV. HOLLOWTECH 44MM', 43.00, 51.00, 8, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (344, 1, 20, 'CHAVE EXTRATOR MOV CENTRO HOLLOWTECH', 35.00, 41.00, 45, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (345, 1, 20, 'CHAVE PEDAL 15MM PRO', 74.00, 87.00, 49, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (346, 1, 20, 'CHAVE RAIO PRO', 19.00, 22.00, 17, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (347, 1, 20, 'CHAVE RAIOS', 9.00, 10.00, 15, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (348, 1, 20, 'CHAVE REMOVER K7 PRO', 108.00, 127.00, 35, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (349, 1, 20, 'CHAVE SACAR CASSETE C/ PINO SCT', 17.00, 21.00, 5, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (350, 1, 20, 'CHAVE TORX Y PRO T25/T30/T40', 28.00, 32.00, 35, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (351, 1, 23, 'COLA UNIUM', 2.00, 2.00, 25, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (352, 1, 24, 'DESENGRAXANTE ALGOO 1L', 13.00, 15.00, 42, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (353, 1, 24, 'DESENGRAXANTE ELEPHANT 1L', 11.00, 13.00, 34, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (354, 1, 26, 'ESPATULA P/ TIRAR PNEU (ACO)', 6.00, 8.00, 28, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (355, 1, 26, 'ESPATULA P/ TIRAR PNEU (NYLON)', 5.00, 6.00, 13, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (356, 1, 26, 'ESPATULAS NYLON 3 PCS ZEFAL', 6.00, 7.00, 7, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (357, 1, 28, 'ESPUMA P/ LIMPEZA 330ML', 6.00, 8.00, 10, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (358, 1, 31, 'GRAXA 50G', 1.00, 2.00, 11, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (359, 1, 31, 'GRAXA AZUL 50 G', 1.00, 2.00, 30, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (360, 1, 31, 'GRAXA GRAFITADA 80 G', 2.00, 2.00, 26, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (361, 1, 31, 'GRAXA LUBRAX 500 G', 15.00, 18.00, 33, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (362, 1, 31, 'GRAXA POTE', 2.00, 2.00, 37, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (363, 1, 33, 'LIMPA CUBO', 2.00, 2.00, 14, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (364, 1, 33, 'LIMPA RAIO (36 PCS)', 0.00, 0.00, 6, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (365, 1, 33, 'LIMPADOR CORRENTE', 13.00, 16.00, 34, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (366, 1, 34, 'LUBRIFICANTE ALGOO CERA 200ML', 11.00, 13.00, 9, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (367, 1, 34, 'LUBRIFICANTE ALGOO CERA 60ML', 5.00, 6.00, 34, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (368, 1, 34, 'LUBRIFICANTE ALGOO PTFE UMIDO', 8.00, 10.00, 9, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (369, 1, 34, 'LUBRIFICANTE DRY ZEFAL', 32.00, 38.00, 14, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (370, 1, 34, 'LUBRIFICANTE ELEPHANT 100G', 16.00, 19.00, 14, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (371, 1, 34, 'LUBRIFICANTE ELEPHANT 30G', 6.00, 8.00, 11, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (372, 1, 34, 'LUBRIFICANTE FINISH LINE', 19.00, 23.00, 33, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (373, 1, 34, 'LUBRIFICANTE LIPIDICLEAN', 17.00, 20.00, 17, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (374, 1, 34, 'LUBRIFICANTE ZEFAL PRO WET', 36.00, 42.00, 15, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (375, 1, 44, 'REMENDO FRIO PEDACO', 0.00, 0.00, 27, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (376, 1, 44, 'REMENDO KIT UNA', 4.00, 5.00, 16, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (377, 1, 44, 'REMENDO KIT VIPAL', 3.00, 4.00, 27, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (378, 1, 44, 'REMENDO RBM 01', 0.00, 0.00, 38, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (379, 1, 44, 'REMENDO S/ COLA ICETOOLZ', 11.00, 13.00, 46, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (380, 1, 44, 'REMENDO TIP TOP GRANDE', 0.00, 0.00, 28, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (381, 1, 44, 'REMENDO TIP TOP PEQUENO', 0.00, 0.00, 23, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (382, 3, 37, 'MEIA CICLISTA ERT', 11.00, 13.00, 20, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (383, 3, 37, 'MEIA CICLISTA OGGI/SKIN/SPECIALIZED', 8.00, 10.00, 19, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (384, 3, 37, 'MEIA CICLISTA TSW', 11.00, 13.00, 6, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (385, 3, 37, 'MEIA CICLISTA TSW SUAVE COMPRESSAO', 13.00, 16.00, 44, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (386, 3, 37, 'MEIA CROSS FIT LURK', 25.00, 30.00, 28, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (387, 3, 37, 'MEIA LONGA C/ COMPRESSÃƒO', 21.00, 25.00, 8, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (388, 3, 37, 'MEIA SKIN', 8.00, 10.00, 50, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (389, 3, 37, 'MEIA SPORT XTREME', 19.00, 22.00, 34, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (390, 3, 3, 'BANDANA BASICA SP', 12.00, 15.00, 34, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (391, 3, 3, 'BANDANA COMUM', 13.00, 15.00, 26, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (392, 3, 3, 'BANDANA ERT', 19.00, 23.00, 17, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (393, 3, 3, 'BANDANA GAUCHO', 12.00, 15.00, 20, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (394, 3, 3, 'BANDANA SXTR', 21.00, 25.00, 35, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (395, 3, 4, 'BERMUDA ELITE SP', 95.00, 112.00, 18, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (396, 3, 4, 'BERMUDA ERT NOVA TOUR DUAL', 55.00, 65.00, 50, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (397, 3, 4, 'BERMUDA FEMININA ACTIVE/SPORT XTREME', 96.00, 113.00, 39, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (398, 3, 4, 'BERMUDA FEMININA BASICA XTREME', 55.00, 65.00, 48, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (399, 3, 4, 'BERMUDA FEMININA GEL ERT', 106.00, 125.00, 8, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (400, 3, 4, 'BERMUDA INFANTIL ERT', 42.00, 50.00, 49, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (401, 3, 4, 'BERMUDA MASCULINA', 90.00, 107.00, 11, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (402, 3, 4, 'BERMUDA MASCULINA ERT DUAL', 80.00, 95.00, 14, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (403, 3, 4, 'BERMUDA MASCULINA ERT GEL', 106.00, 125.00, 32, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (404, 3, 4, 'BERMUDA MASCULINA EXPERT XTREME', 152.00, 179.00, 23, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (405, 3, 4, 'BERMUDA MASCULINA XTREME', 82.00, 96.00, 25, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (406, 3, 4, 'BERMUDA PENKS', 91.00, 108.00, 9, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (407, 3, 4, 'BERMUDA SAIA ERT', 91.00, 108.00, 34, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (408, 3, 13, 'CAMISA CASUAL TSW', 37.00, 43.00, 47, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (409, 3, 13, 'CAMISA ERT ELITE', 76.00, 90.00, 42, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (410, 3, 13, 'CAMISA ERT ELITE RACING', 76.00, 90.00, 30, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (411, 3, 13, 'CAMISA ERT NOVA TOUR', 62.00, 73.00, 25, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (412, 3, 13, 'CAMISA FEMININA 3XU 467 MANGA LONGA C621RP', 55.00, 65.00, 15, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (413, 3, 13, 'CAMISA FEMININA BIKE LOVE C520PP', 55.00, 65.00, 46, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (414, 3, 13, 'CAMISA FEMININA ERT NOVA TOUR', 56.00, 66.00, 39, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (415, 3, 13, 'CAMISA FEMININA FORMS C1100RM', 59.00, 70.00, 16, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (416, 3, 13, 'CAMISA FEMININA HIGH ONE', 63.00, 74.00, 40, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (417, 3, 13, 'CAMISA FEMININA SS VENUS VERDE/ROSA', 53.00, 63.00, 16, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (418, 3, 13, 'CAMISA INFANTIL MASC./FEM ERT', 45.00, 53.00, 20, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (419, 3, 13, 'CAMISA MASC/FEM ERT N TOUR STRIPE', 73.00, 86.00, 40, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (420, 3, 13, 'CAMISA MASCULINA ABSTRACT C040GG', 63.00, 74.00, 46, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (421, 3, 13, 'CAMISA MASCULINA ERT N. TOUR STRIPE', 60.00, 71.00, 50, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (422, 3, 13, 'CAMISA MASCULINA ERT PREMIUM BLACK', 103.00, 122.00, 15, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (423, 3, 13, 'CAMISA MASCULINA HURACAN C1190VG', 56.00, 66.00, 12, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (424, 3, 13, 'CAMISA MASCULINA HURRICANE', 56.00, 66.00, 19, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (425, 3, 13, 'CAMISA MASCULINA MULTIPLIED CN890AGG', 48.00, 57.00, 45, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (426, 3, 13, 'CAMISA MASCULINA REFACTOR TITANIUM MANGA LONGA (GG', 60.00, 71.00, 25, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (427, 3, 13, 'CAMISA MASCULINA SENSE ACTIV', 66.00, 77.00, 19, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (428, 3, 13, 'CAMISA MASCULINA SOUTH', 78.00, 92.00, 34, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (429, 3, 13, 'CAMISA MASCULINA TORO', 60.00, 71.00, 22, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (430, 3, 13, 'CAMISA MASCULINA TSW', 93.00, 109.00, 22, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (431, 3, 13, 'CAMISA SP', 77.00, 90.00, 32, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (432, 3, 13, 'CAMISA TOUR OGGI', 53.00, 62.00, 29, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (433, 3, 13, 'CAMISA TOUR SS FUN OGGI', 48.00, 56.00, 23, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (434, 3, 13, 'CAMISA XTREME MASC./FEM', 90.00, 106.00, 48, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (435, 3, 35, 'LUVA ABERTA CLY', 17.00, 20.00, 45, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (436, 3, 35, 'LUVA ABERTA INFANTIL CXR', 15.00, 17.00, 33, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (437, 3, 35, 'LUVA ABERTA MOKE', 24.00, 28.00, 25, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (438, 3, 35, 'LUVA ABERTA SKIN SPORT FUN', 17.00, 20.00, 10, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (439, 3, 35, 'LUVA ABERTA SKIN SS RACE II', 41.00, 48.00, 30, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (440, 3, 35, 'LUVA ABERTA SKIN SS VENUS', 27.00, 32.00, 7, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (441, 3, 35, 'LUVA ABERTA TSW COMBAT', 21.00, 25.00, 23, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (442, 3, 35, 'LUVA CURTA SPORTIV FEMININA MOD. 405', 24.00, 28.00, 7, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (443, 3, 35, 'LUVA FECHADA ATRIO', 31.00, 36.00, 8, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (444, 3, 35, 'LUVA FECHADA CLY GEL', 34.00, 41.00, 45, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (445, 3, 35, 'LUVA FECHADA FEMININA CXR', 34.00, 40.00, 49, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (446, 3, 35, 'LUVA FECHADA FLUID H. ONE', 23.00, 27.00, 17, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (447, 3, 35, 'LUVA FECHADA SKIN SS AIR GEL', 53.00, 63.00, 15, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (448, 3, 35, 'LUVA FECHADA SKIN SS FLAT', 46.00, 54.00, 35, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (449, 3, 35, 'LUVA FECHADA SPORTIV', 49.00, 58.00, 5, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (450, 3, 35, 'LUVA FECHADA TSW', 52.00, 61.00, 35, 11);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (451, 3, 35, 'LUVA MEIO DEDO ATRIO', 30.00, 36.00, 25, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (452, 3, 35, 'LUVA MEIO DEDO FREERIDE', 17.00, 21.00, 42, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (453, 3, 35, 'LUVA SKIN FECHADA', 51.00, 60.00, 34, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (454, 3, 35, 'LUVA SKIN SPORT KIDS', 16.00, 19.00, 28, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (455, 3, 35, 'LUVA SPACE LONGA H. ONE', 29.00, 34.00, 13, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (456, 3, 35, 'LUVA SPORTIV CURTA COROA', 19.00, 22.00, 7, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (457, 3, 35, 'LUVA SPORTIV CURTA JB517', 18.00, 22.00, 10, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (458, 3, 35, 'LUVA SPORTIV CURTA MOD. 1457', 25.00, 29.00, 11, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (459, 3, 35, 'LUVA SPORTIV CURTA MOD. 224', 14.00, 16.00, 30, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (460, 3, 35, 'LUVA SPORTIV CURTA MOD.325', 14.00, 16.00, 26, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (461, 3, 35, 'LUVA SPORTIV CURTA MOD.443', 25.00, 29.00, 33, 10);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (462, 3, 35, 'LUVA SPORTIV CURTA RACE', 25.00, 29.00, 37, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (463, 3, 35, 'LUVA SPORTIV GEL SUBLIMACAO S/ VELCRO', 32.00, 38.00, 14, 12);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (464, 3, 35, 'LUVA SPORTIV LONGA RIDER', 27.00, 32.00, 6, 7);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (512, 4, NULL, 'BICICLETA 12 NATHOR', 99.62, 117.20, 0, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (513, 4, NULL, 'BICICLETA 12 NATHOR SELIM PU', 110.20, 129.65, 2, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (514, 4, NULL, 'BICICLETA 16 NATHOR', 363.38, 427.50, 2, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (515, 4, NULL, 'BICICLETA 20 NATHOR', 350.75, 412.65, 1, 8);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (516, 4, NULL, 'BICICLETA 26 MALAGA CLASSIC', 406.22, 477.90, 0, 9);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (517, 4, NULL, 'BICICLETA 29 ELLEVEN 21V T17 PT/VD', 1104.15, 1299.00, 1, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (518, 4, NULL, 'BICICLETA 29 ELLEVEN 21V T17 PT/VERM(806120207)', 1104.15, 1299.00, 1, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (519, 4, NULL, 'BICICLETA 29 LOTUS LRJ K1204810', 904.19, 1063.75, 0, 6);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (520, 4, NULL, 'BICICLETA 29 RAVA 21V T17 PT/VD/AZ', 1019.15, 1199.00, 3, 14);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (521, 4, NULL, 'BICICLETA 29 RAVA 21V T17 PT/VR/VL', 1019.15, 1199.00, 0, 5);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (522, 4, NULL, 'BICICLETA 29 RAVA 24V T15,5 FEM PT/AZ/VR', 1088.00, 1280.00, 0, 15);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (523, 4, NULL, 'BICICLETA 29 RAVA 27V T17 FEM PT/PK/VL', 1396.55, 1643.00, 2, 13);
+INSERT INTO tb_produtos (id, id_classe_principal, id_classe_secundaria, descricao, vl_compra, vl_venda, qt_estoque, qt_min_estoque) VALUES (524, 4, NULL, 'BICICLETA 29 TSW 27V', 1380.40, 1624.00, 2, 11);
+
+
+INSERT INTO tb_servicos (id, descricao, vl_manutencao) VALUES (1, 'TROCA DE PNEU', 7.00);
+INSERT INTO tb_servicos (id, descricao, vl_manutencao) VALUES (2, 'TROCA DE CORRENTE', 10.00);
+INSERT INTO tb_servicos (id, descricao, vl_manutencao) VALUES (3, 'TROCA DE CAMARA', 7.00);
+INSERT INTO tb_servicos (id, descricao, vl_manutencao) VALUES (4, 'LUBRIFICAÇÃO DA CORRENTE', 5.00);
+INSERT INTO tb_servicos (id, descricao, vl_manutencao) VALUES (5, 'REVISÃO GERAL', 125.00);
+INSERT INTO tb_servicos (id, descricao, vl_manutencao) VALUES (6, 'LUBRIFICAÇÃO DOS CUBOS', 23.00);
+INSERT INTO tb_servicos (id, descricao, vl_manutencao) VALUES (7, 'LUBRIFICAÇÃO DA CAIXA DE DIREÇÃO', 15.00);
+INSERT INTO tb_servicos (id, descricao, vl_manutencao) VALUES (8, 'LUBRIFICAÇÃO DO MOVIMENTO CENTRAL', 25.00);
+INSERT INTO tb_servicos (id, descricao, vl_manutencao) VALUES (9, 'TROCA DE CABOS E CONDUITES', 10.00);
+INSERT INTO tb_servicos (id, descricao, vl_manutencao) VALUES (10, 'REGULAGEM DE FREIOS E MARCHA', 12.00);
+INSERT INTO tb_servicos (id, descricao, vl_manutencao) VALUES (11, 'MONTAGEM COMPLETA', 150.00);
+
+
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (1, 1, '2021-11-15', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (2, 2, '2021-11-16', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (3, 3, '2021-11-17', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (4, 4, '2021-11-18', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (5, 5, '2021-11-15', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (6, 6, '2021-11-16', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (7, 7, '2021-11-16', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (8, 8, '2021-11-16', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (9, 9, '2021-11-16', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (10, 10, '2021-11-17', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (11, 11, '2021-11-18', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (12, 12, '2021-11-18', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (13, 13, '2021-11-19', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (14, 14, '2021-11-19', 'Cheque', 3);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (15, 15, '2021-11-16', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (16, 16, '2021-11-15', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (17, 17, '2021-11-18', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (18, 18, '2021-11-18', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (19, 19, '2021-11-19', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (20, 20, '2021-11-15', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (21, 21, '2021-11-16', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (22, 22, '2021-11-18', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (23, 23, '2021-11-19', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (24, 24, '2021-11-16', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (25, 25, '2020-11-22', 'Dinheiro', NULL);
+INSERT INTO tb_vendas (id, id_orcamento, data_venda, forma_pagamento, parcelamento) VALUES (26, 26, '2021-10-22', 'Dinheiro', NULL);
+
+//criando views
+CREATE VIEW v_tempo_medio_valor_medio_man_valor_medio_horas_fun AS
+SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(a.fim_manutencao) - TIME_TO_SEC(a.inicio_manutencao))/COUNT(a.id)) tempo_medio_manutencao,
+(SUM(b.qt_servico * c.vl_manutencao)) / COUNT(c.id) valor_medio_manutencao,
+(d.salario_base / 30)/d.carga_horaria valor_medio_horas_funcionario
+FROM tb_manutencoes a
+JOIN tb_orcamentos b
+ON b.id_cliente = a.id_cliente
+JOIN tb_servicos c
+ON c.id = b.id_servico
+JOIN tb_funcionarios d
+ON d.id = a.id_funcionario;
+
+CREATE VIEW v_bicicletas_dia AS
+SELECT data_entrada,
+COUNT(data_entrada) qt_bicicletas
+FROM tb_manutencoes
+GROUP BY data_entrada;
+
+CREATE VIEW v_custo_funcionario AS
+SELECT nome,
+(salario_base * 0.08) +  salario_base custo_fgts,
+(salario_base / 12) * 0.08 + (salario_base / 12) prov_13salario,
+(salario_base / 3 / 12 * 0.08) + (salario_base / 3 / 12) prov_ferias,
+(salario_base * 0.08) +  salario_base + (salario_base / 12 + 0.08) + (salario_base / 3 / 12 + 0.08) costo_mensal
+FROM tb_funcionarios;
+
+CREATE VIEW v_fora_do_prazo AS
+SELECT COUNT(id) fora_do_prazo
+from tb_manutencoes
+WHERE data_prevista < data_entrega;
+
+CREATE VIEW v_lucro_geral AS
+SELECT b.descricao,
+b.vl_compra,
+b.vl_venda,
+b.vl_venda - b.vl_compra lucro_pecas
+FROM tb_orcamentos a
+left JOIN tb_produtos b
+ON b.id = a.id_produto
+JOIN tb_classe_principal c
+ON c.id = b.id_classe_principal;
+
+CREATE VIEW v_lucro_pecas AS
+SELECT b.descricao,
+b.vl_compra,
+b.vl_venda,
+b.vl_venda - b.vl_compra lucro_pecas
+FROM tb_orcamentos a
+left JOIN tb_produtos b
+ON b.id = a.id_produto
+JOIN tb_classe_principal c
+ON c.id = b.id_classe_principal
+WHERE b.id_classe_principal <> 2
+AND b.id_classe_principal <> 3
+AND b.id_classe_principal <> 4
+AND b.id_classe_principal <> 6
+AND b.id_classe_principal <> 8;
+
+CREATE VIEW v_tempo_medio_manutencao AS
+SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(fim_manutencao) - TIME_TO_SEC(inicio_manutencao))/COUNT(id)) tempo_medio_manutencao
+FROM tb_manutencoes;
+
+CREATE VIEW v_valor_caixa_ano AS
+SELECT a.data_venda,
+SUM(b.qt_produto * c.vl_venda) vl_total_venda,
+SUM(d.vl_manutencao * b.qt_servico) vl_total_servico,
+(SUM(b.qt_produto * c.vl_venda) + COALESCE(SUM((d.vl_manutencao * b.qt_servico)),0)) total_caixa_dia
+FROM tb_vendas a
+JOIN tb_orcamentos b
+ON b.id = a.id_orcamento
+LEFT JOIN tb_produtos c
+ON c.id = b.id_produto
+LEFT JOIN tb_servicos d
+ON d.id = b.id_servico
+WHERE forma_pagamento = 'Dinheiro'
+GROUP BY YEAR(data_venda);
+
+CREATE VIEW v_valor_caixa_dia AS
+SELECT a.data_venda,
+SUM(b.qt_produto * c.vl_venda) vl_total_venda,
+SUM(d.vl_manutencao * b.qt_servico) vl_total_servico,
+(SUM(b.qt_produto * c.vl_venda) + COALESCE(SUM((d.vl_manutencao * b.qt_servico)),0)) total_caixa_dia
+FROM tb_vendas a
+JOIN tb_orcamentos b
+ON b.id = a.id_orcamento
+LEFT JOIN tb_produtos c
+ON c.id = b.id_produto
+LEFT JOIN tb_servicos d
+ON d.id = b.id_servico
+WHERE forma_pagamento = 'Dinheiro'
+GROUP BY data_venda;
+
+CREATE VIEW v_valor_caixa_mes AS
+SELECT a.data_venda,
+SUM(b.qt_produto * c.vl_venda) vl_total_venda,
+SUM(d.vl_manutencao * b.qt_servico) vl_total_servico,
+(SUM(b.qt_produto * c.vl_venda) + COALESCE(SUM((d.vl_manutencao * b.qt_servico)),0)) total_caixa_dia
+FROM tb_vendas a
+JOIN tb_orcamentos b
+ON b.id = a.id_orcamento
+LEFT JOIN tb_produtos c
+ON c.id = b.id_produto
+LEFT JOIN tb_servicos d
+ON d.id = b.id_servico
+WHERE forma_pagamento = 'Dinheiro'
+GROUP BY MONTH(data_venda);
+
+CREATE VIEW v_valor_entrada_setores AS
+SELECT SUM(b.qt_produto * c.vl_venda) vl_total_venda,
+SUM(d.vl_manutencao * b.qt_servico) vl_total_servico,
+(SUM(b.qt_produto * c.vl_venda) + SUM((d.vl_manutencao * b.qt_servico))) total
+FROM tb_vendas a
+JOIN tb_orcamentos b
+ON b.id = a.id_orcamento
+LEFT JOIN tb_produtos c
+ON c.id = b.id_produto
+LEFT JOIN tb_servicos d
+ON d.id = b.id_servico;
+
+CREATE VIEW v_valor_medio_manutencao AS
+SELECT SUM(d.vl_manutencao) / COUNT(b.qt_servico) vl_medio_manutencao
+FROM tb_vendas a
+JOIN tb_orcamentos b
+ON b.id = a.id_orcamento
+LEFT JOIN tb_produtos c
+ON c.id = b.id_produto
+LEFT JOIN tb_servicos d
+ON d.id = b.id_servico
+WHERE forma_pagamento = 'Dinheiro'
+AND b.id_manutencao IS NOT NULL;
+
+CREATE VIEW v_valor_salario_hora AS
+SELECT *,
+(salario_base / 30) / carga_horaria vl_salario_hora
+FROM tb_funcionarios;
+
+CREATE VIEW v_vendas_vs_manutencao AS
+SELECT SUM(b.qt_produto * c.vl_venda) vl_total_venda,
+SUM(d.vl_manutencao * b.qt_servico) vl_total_servico
+FROM tb_vendas a
+JOIN tb_orcamentos b
+ON b.id = a.id_orcamento
+LEFT JOIN tb_produtos c
+ON c.id = b.id_produto
+LEFT JOIN tb_servicos d
+ON d.id = b.id_servico;
